@@ -81,7 +81,7 @@ public class {{classname}} {{#parent}}extends {{{parent}}}{{/parent}} {{#seriali
       return false;
     }
     {{classname}} {{classVarName}} = ({{classname}}) o;{{#hasVars}}
-    return {{#vars}}Objects.equals({{name}}, {{classVarName}}.{{name}}){{#hasMore}} &&
+    return {{#vars}}Objects.equals(this.{{name}}, {{classVarName}}.{{name}}){{#hasMore}} &&
         {{/hasMore}}{{^hasMore}};{{/hasMore}}{{/vars}}{{/hasVars}}{{^hasVars}}
     return true;{{/hasVars}}
   }
