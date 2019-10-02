@@ -79,8 +79,13 @@ public class {{classname}} {{#parent}}extends {{{parent}}}{{/parent}} {{#seriali
     }
     if (o == null || getClass() != o.getClass()) {
       return false;
+    }{{#parent}}
+    if (!super.equals(o)) {
+        return false;
     }
-    {{classname}} {{classVarName}} = ({{classname}}) o;{{#hasVars}}
+    {{/parent}}
+    {{#hasVars}}
+    {{classname}} {{classVarName}} = ({{classname}}) o;
     return {{#vars}}Objects.equals(this.{{name}}, {{classVarName}}.{{name}}){{#hasMore}} &&
         {{/hasMore}}{{^hasMore}};{{/hasMore}}{{/vars}}{{/hasVars}}{{^hasVars}}
     return true;{{/hasVars}}
