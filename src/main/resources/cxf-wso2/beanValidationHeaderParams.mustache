@@ -1,2 +1,2 @@
-  @Valid
-{{#isNullable}} @Nullable {{/isNullable}}{{^isNullable}}{{#required}} @NotNull(message = "Property {{{name}}} cannot be null.") {{/required}}{{/isNullable}}{{>beanValidationCore}}
+    @Valid{{#isNullable}}
+        @Nullable {{/isNullable}}{{^isNullable}}{{#required}} @NotNull(message = "Property {{{name}}} cannot be null.") {{/required}}{{/isNullable}}{{>beanValidationCore}}
