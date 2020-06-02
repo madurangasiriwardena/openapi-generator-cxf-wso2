@@ -1,1 +1,1 @@
-{{#isFormParam}}{{^isFile}}{{{dataType}}} {{paramName}}{{/isFile}}{{#isFile}}InputStream {{paramName}}InputStream, Attachment {{paramName}}Detail{{/isFile}}{{/isFormParam}}
+{{#isFormParam}}{{^isFile}}{{{dataType}}} {{paramName}}{{/isFile}}{{#isFile}}{{^isListContainer}}InputStream {{paramName}}InputStream, Attachment {{paramName}}Detail{{/isListContainer}}{{#isListContainer}}List<InputStream> {{paramName}}InputStream, List<Attachment> {{paramName}}Detail{{/isListContainer}}{{/isFile}}{{/isFormParam}}
