@@ -26,6 +26,10 @@ import java.io.InputStream;
 import java.util.List;
 {{#imports}}import {{import}};
 {{/imports}}
+{{#x-gen-include-req-res}}
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+{{/x-gen-include-req-res}}
 import javax.ws.rs.core.Response;
 
 {{>generatedAnnotation}}
@@ -33,7 +37,7 @@ import javax.ws.rs.core.Response;
 public interface {{classname}}Service {
   {{#operation}}
 
-      public Response {{nickname}}({{#allParams}}{{>serviceQueryParams}}{{>servicePathParams}}{{>serviceHeaderParams}}{{>serviceBodyParams}}{{>serviceFormParams}}{{#hasMore}}, {{/hasMore}}{{/allParams}});
+      public Response {{nickname}}({{#x-gen-include-req-res}}HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, {{/x-gen-include-req-res}}{{#allParams}}{{>serviceQueryParams}}{{>servicePathParams}}{{>serviceHeaderParams}}{{>serviceBodyParams}}{{>serviceFormParams}}{{#hasMore}}, {{/hasMore}}{{/allParams}});
   {{/operation}}
 }
 {{/operations}}
