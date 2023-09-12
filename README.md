@@ -84,3 +84,10 @@ mvn clean install
 ```
 
 4. Comment out the plugin added for your API definition before committing to the git.
+
+#### Supported vendor extensions
+| Extension | Purpose | Description                                                                                                                                                   | Example |
+|---|---|---|---|
+| x-gen-include-req-res | Get the HttpServletRequest and the HttpServletResponse objects to the generated code. | Should be added to root of the yaml. If the value is set to `true` then the request and response objects will be available in the generated api impl classes. | x-gen-include-req-res: true |
+
+

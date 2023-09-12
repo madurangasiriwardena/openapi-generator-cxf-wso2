@@ -28,8 +28,15 @@ import java.util.List;
 {{/imports}}
 import {{package}}.{{classname}}Service;
 
+{{#x-gen-include-req-res}}
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+{{/x-gen-include-req-res}}
 import javax.validation.Valid;
 import javax.ws.rs.*;
+{{#x-gen-include-req-res}}
+import javax.ws.rs.core.Context;
+{{/x-gen-include-req-res}}
 import javax.ws.rs.core.Response;
 import io.swagger.annotations.*;
 
@@ -63,9 +70,9 @@ public class {{classname}}  {
     @ApiResponses(value = { {{#responses}}
         @ApiResponse(code = {{{code}}}, message = "{{{message}}}", response = {{{baseType}}}.class{{#containerType}}, responseContainer = "{{{containerType}}}"{{/containerType}}){{#hasMore}},{{/hasMore}}{{/responses}}
     })
-    public Response {{nickname}}({{#allParams}}{{>queryParams}}{{>pathParams}}{{>headerParams}}{{>bodyParams}}{{>formParams}}{{#hasMore}}, {{/hasMore}}{{/allParams}}) {
+    public Response {{nickname}}({{#x-gen-include-req-res}}@Context HttpServletRequest httpServletRequest, @Context HttpServletResponse httpServletResponse, {{/x-gen-include-req-res}}{{#allParams}}{{>queryParams}}{{>pathParams}}{{>headerParams}}{{>bodyParams}}{{>formParams}}{{#hasMore}}, {{/hasMore}}{{/allParams}}) {
 
-        return delegate.{{nickname}}({{#allParams}}{{#isFile}}{{paramName}}InputStream, {{paramName}}Detail{{/isFile}}{{^isFile}}{{paramName}}{{/isFile}}{{#hasMore}}, {{/hasMore}} {{/allParams}});
+        return delegate.{{nickname}}({{#x-gen-include-req-res}}httpServletRequest, httpServletResponse, {{/x-gen-include-req-res}}{{#allParams}}{{#isFile}}{{paramName}}InputStream, {{paramName}}Detail{{/isFile}}{{^isFile}}{{paramName}}{{/isFile}}{{#hasMore}}, {{/hasMore}} {{/allParams}});
     }
 
 {{/operation}}

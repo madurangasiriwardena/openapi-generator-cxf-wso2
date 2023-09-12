@@ -1,5 +1,6 @@
 package org.wso2.carbon.codegen;
 
+import io.swagger.v3.oas.models.OpenAPI;
 import org.openapitools.codegen.*;
 import io.swagger.models.properties.*;
 import org.openapitools.codegen.languages.JavaJAXRSCXFCDIServerCodegen;
@@ -8,6 +9,9 @@ import java.util.*;
 import java.io.File;
 
 public class CxfWso2Generator extends JavaJAXRSCXFCDIServerCodegen {
+
+  // Property to denote whether to include request/response objects in the generated code.
+  private static final String X_GEN_INCLUDE_REQ_RES = "x-gen-include-req-res";
 
   /**
    * Configures the type of generator.
@@ -73,9 +77,20 @@ public class CxfWso2Generator extends JavaJAXRSCXFCDIServerCodegen {
     if (additionalProperties.containsKey(USE_BEANVALIDATION)) {
       this.setUseBeanValidation(convertPropertyToBoolean(USE_BEANVALIDATION));
     }
-
     writePropertyBack(USE_BEANVALIDATION, useBeanValidation);
 
     supportingFiles.clear(); // Don't need extra files provided by AbstractJAX-RS & Java Codegen
+  }
+
+  @Override
+  public void preprocessOpenAPI(OpenAPI openAPI) {
+    super.preprocessOpenAPI(openAPI);
+
+    if (openAPI != null && openAPI.getExtensions() != null) {
+      Object genIncludeReqRes = openAPI.getExtensions().get(X_GEN_INCLUDE_REQ_RES);
+      if (genIncludeReqRes != null) {
+        additionalProperties.put(X_GEN_INCLUDE_REQ_RES, Boolean.parseBoolean(genIncludeReqRes.toString()));
+      }
+    }
   }
 }

@@ -21,6 +21,11 @@ package {{package}}.impl;
 import {{package}}.*;
 import {{modelPackage}}.*;
 import java.util.List;
+
+{{#x-gen-include-req-res}}
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+{{/x-gen-include-req-res}}
 import javax.ws.rs.core.Response;
 {{>generatedAnnotation}}
 {{#operations}}
@@ -28,7 +33,7 @@ public class {{classname}}ServiceImpl implements {{classname}}Service {
     {{#operation}}
 
     @Override
-    public Response {{nickname}}({{#allParams}}{{>serviceQueryParams}}{{>servicePathParams}}{{>serviceHeaderParams}}{{>serviceBodyParams}}{{>serviceFormParams}}{{#hasMore}}, {{/hasMore}}{{/allParams}}) {
+    public Response {{nickname}}({{#x-gen-include-req-res}}HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, {{/x-gen-include-req-res}}{{#allParams}}{{>serviceQueryParams}}{{>servicePathParams}}{{>serviceHeaderParams}}{{>serviceBodyParams}}{{>serviceFormParams}}{{#hasMore}}, {{/hasMore}}{{/allParams}}) {
 
         // do some magic!
         return Response.ok().entity("magic!").build();
