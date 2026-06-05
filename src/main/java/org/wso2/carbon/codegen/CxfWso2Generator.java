@@ -74,6 +74,9 @@ public class CxfWso2Generator extends JavaJAXRSCXFCDIServerCodegen {
   public void processOpts() {
     super.processOpts();
 
+    // Expose the current year so license headers stay up to date automatically.
+    additionalProperties.put("currentYear", String.valueOf(java.time.Year.now().getValue()));
+
     if (additionalProperties.containsKey(USE_BEANVALIDATION)) {
       this.setUseBeanValidation(convertPropertyToBoolean(USE_BEANVALIDATION));
     }
