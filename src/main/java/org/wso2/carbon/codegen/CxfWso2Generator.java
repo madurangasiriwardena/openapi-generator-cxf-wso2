@@ -6,6 +6,8 @@ import io.swagger.models.properties.*;
 import org.openapitools.codegen.languages.JavaJAXRSCXFCDIServerCodegen;
 
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Stream;
 import java.io.File;
 import java.io.IOException;
@@ -18,6 +20,17 @@ public class CxfWso2Generator extends JavaJAXRSCXFCDIServerCodegen {
 
   // Property to denote whether to include request/response objects in the generated code.
   private static final String X_GEN_INCLUDE_REQ_RES = "x-gen-include-req-res";
+
+  // Matches the year in the newly generated header (always the current template's "WSO2 LLC."
+  // form, single year), used to rewrite it into a range, e.g. "Copyright (c) 2025, WSO2 LLC."
+  private static final Pattern COPYRIGHT_YEAR_PATTERN =
+      Pattern.compile("Copyright \\(c\\) (\\d{4})(?:-\\d{4})?, WSO2 LLC\\.");
+
+  // Leniently extracts the start year from an existing header, regardless of its format (e.g.
+  // "Copyright (c) 2019, WSO2 Inc. ..." or "Copyright (c) 2019-2024, WSO2 LLC. ..."). For a range
+  // only the first year is captured, which is exactly the start year we want to carry forward.
+  private static final Pattern COPYRIGHT_START_YEAR_PATTERN =
+      Pattern.compile("Copyright \\(c\\) (\\d{4})");
 
   // Snapshot of already-generated .java files (absolute path -> content) taken before generation,
   // used to avoid rewriting a file when only its license header (e.g. the year) changed while the
@@ -134,10 +147,15 @@ public class CxfWso2Generator extends JavaJAXRSCXFCDIServerCodegen {
   }
 
   /**
-   * If a regenerated file already existed and differs from the previous version only within its
-   * license header (for example the copyright year), restores the previous content so the file is
-   * left untouched in version control. Files whose class content actually changed (and brand new
-   * files) are written normally with the current year.
+   * Adjusts the license-header year of each regenerated file:
+   * <ul>
+   *   <li>Brand new file: keeps the current year (as rendered from the template).</li>
+   *   <li>Existing file whose class content is unchanged: restores the previous content so the
+   *       file is left untouched in version control (the year is not bumped).</li>
+   *   <li>Existing file whose class content changed: keeps the original start year and extends the
+   *       range to the current year, i.e. {@code 2xxx} becomes {@code 2xxx-currentYear} and
+   *       {@code 2xxx-2yyy} becomes {@code 2xxx-currentYear}.</li>
+   * </ul>
    */
   @Override
   public void postProcessFile(File file, String fileType) {
@@ -158,10 +176,35 @@ public class CxfWso2Generator extends JavaJAXRSCXFCDIServerCodegen {
       if (bodyAfterLicenseHeader(newContent).equals(bodyAfterLicenseHeader(oldContent))) {
         // Only the license header changed; the class content is identical: keep the existing file.
         Files.write(file.toPath(), oldContent.getBytes(StandardCharsets.UTF_8));
+        return;
+      }
+      // Class content changed: preserve the original start year as a range up to the current year.
+      String updated = applyYearRange(newContent, oldContent);
+      if (!updated.equals(newContent)) {
+        Files.write(file.toPath(), updated.getBytes(StandardCharsets.UTF_8));
       }
     } catch (IOException e) {
       // On any I/O error, leave the regenerated file as-is.
     }
+  }
+
+  /**
+   * Rewrites the copyright year of {@code newContent} to {@code <startYear>-<currentYear>}, where
+   * {@code startYear} is taken from {@code oldContent}'s header (the first year of a single year or
+   * a range). If both years are the same the single current year is kept. If either header has no
+   * recognizable year, {@code newContent} is returned unchanged.
+   */
+  private String applyYearRange(String newContent, String oldContent) {
+    Matcher oldMatcher = COPYRIGHT_START_YEAR_PATTERN.matcher(oldContent);
+    Matcher newMatcher = COPYRIGHT_YEAR_PATTERN.matcher(newContent);
+    if (!oldMatcher.find() || !newMatcher.find()) {
+      return newContent;
+    }
+    String startYear = oldMatcher.group(1);
+    String currentYear = String.valueOf(additionalProperties.get("currentYear"));
+    String range = startYear.equals(currentYear) ? currentYear : startYear + "-" + currentYear;
+    return newMatcher.replaceFirst(
+        Matcher.quoteReplacement("Copyright (c) " + range + ", WSO2 LLC."));
   }
 
   /**
